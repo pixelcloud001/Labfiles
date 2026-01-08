@@ -42,6 +42,7 @@ function add-courseuser {
     param (
         $databasefile = ".\MyLabFile.csv",
         [Parameter(Mandatory)]
+        [ValidatePattern({^[A-Z][\w \-]*$}, ErrorMessage = 'Name must start with a capital letter and contain only letters, numbers, underscores, hyphens, or spaces.')]
         [String]$Name,
         [Parameter(Mandatory)]
         [int]$age,
@@ -64,6 +65,15 @@ function add-courseuser {
     Set-Content -Value $NewCSv -Path $databasefile
 }
 
+function Confirm-CourseID{
+    $userlist = GetUserData
+    #[regex]::Match($userlist.Id , (\d))
+    foreach($user in $userlist){
+        if(!($user.Id -match '^\d+$')){
+            $user
+        }
+    }
+}
 function remove-courseuser {
     [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact = 'high')]
     param (
