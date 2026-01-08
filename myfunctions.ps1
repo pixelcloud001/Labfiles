@@ -2,7 +2,14 @@ function GetUserData {
    Get-Content -Path .\MyLabFile.csv | ConvertFrom-Csv
 }
 
-function Get-CourseUser_old {
+enum ColorEnum {
+    red
+    green
+    yellow
+    blue
+}
+
+function Get-CourseUser {
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -13,7 +20,7 @@ function Get-CourseUser_old {
     $MyUserList | Where-Object -Property Age -ge $olderThan
 }
 
-function get-courseuser {
+function add-courseuser {
     [CmdletBinding()]
     param (
         $databasefile = ".\MyLabFile.csv",
@@ -22,8 +29,7 @@ function get-courseuser {
         [Parameter(Mandatory)]
         [int]$age,
         [Parameter(Mandatory)]
-        [ValidateSet('red', 'green', 'blue', 'yellow')]
-        [string]$color,
+        [ColorEnum] $color,
         [int]$UserId
     )
     
@@ -44,17 +50,22 @@ function remove-courseuser {
     param (
         $databasefile = ".\MyLabFile.csv"
     )
-    
+    if ($PSCmdlet.ShouldProcess([string]$RemoveUser.Name)){
         $MyUserListFile = $databasefile
         $MyUserList = Get-Content -Path $MyUserListFile | ConvertFrom-Csv
         $RemoveUser = $MyUserList | Out-ConsoleGridView -OutputMode Single
         $MyUserList = $MyUserList | Where-Object {
         -not (
-            $_.Name -eq $RemoveUser.Name #-and
-           # $_.Age -eq $RemoveUser.Age -and
-           # $_.Color -eq $RemoveUser.Color -and
-           # $_.Id -eq $RemoveUser.Id
+            $_.Name -eq $RemoveUser.Name -and
+            $_.Age -eq $RemoveUser.Age -and
+            $_.Color -eq $RemoveUser.Color -and
+            $_.Id -eq $RemoveUser.Id
         )
-        Set-Content -Value $MyUserList -Path $MyUserListFile    
+        }
+      Set-Content -Value $($MyUserList | ConvertTo-Csv -notypeInformation) -Path $MyUserListFile
+    }
+    else{
+        write-host "Did not remove user $($RemoveUser.Name)"
+    }
 
 }
