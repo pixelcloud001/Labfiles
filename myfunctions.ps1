@@ -1,5 +1,15 @@
 function GetUserData {
-   Get-Content -Path .\MyLabFile.csv | ConvertFrom-Csv
+    try {
+        Get-Content -Path .\MyLabFile.csv -ErrorAction stop | ConvertFrom-Csv -ErrorAction Stop
+        #Get-Service sdfdsg -ErrorAction -break
+    }
+    catch [System.Management.Automation.ItemNotFoundException]{
+        write-error "Databasefile not found"
+    }
+    catch{
+        "Super catch"
+    }
+   
 }
 
 enum ColorEnum {
@@ -70,7 +80,7 @@ function Confirm-CourseID{
     #[regex]::Match($userlist.Id , (\d))
     foreach($user in $userlist){
         if(!($user.Id -match '^\d+$')){
-            $user
+            write-error "User $($user.Name) dont have right format"
         }
     }
 }
